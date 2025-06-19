@@ -1,14 +1,13 @@
 # About
-This project is for the BoulderJS talk on April 24, 2025.
+This project is for the DenverScript talk on June 24, 2025.
 The objective is to show that in specific cases, such as high-frequency data streaming, JS / Node's event loop can cause unpredictable results in the main thread.
 
 This specific use case is modeled on my work with creating high-frequency stock feed and analysis systems from 2007. The general basis is a stream of packets, defined by the stock exchanges, and doing some level of rapid work on them.
 This is an EXAMPLE, and not production ready, nor does it attempt to highlight every possible use case.
 
 The file writer simulates a high-frequency lossess packet stream.
-The reader takes in multiple file streams and processes spikes in the main thread. Spikes are calculated using the classic Welford algorithm. 
-When a spike is recorded, it is passed to the main thread. Here, we updates a visualization class that renders the output of the delay every 50ms. 
-Each file has its own line, and the delay is shown in a line of '=', where each '=' indicates a 2ms delay.
+The reader takes in multiple file streams and processes the average Euclidean distance of new Price/Volume "ticks" against the stored ticks at set intervals. 
+Each file has its own line, and the delay is shown in a line of '=', where each '=' indicates a 5ms delay.
 
 Example:
 <pre>Sun Apr 13 2025 09:29:06 GMT-0600 (Mountain Daylight Time) 
@@ -65,29 +64,11 @@ Mac with ARM chips:
 
 
 ## How to run
-### Create a data file with "packets"
-`node /js/node/writer/fileWriter.mjs --file <filePath> --seed <seed number>`
-the `--seed` value will generate the same ticker price, volume and delay on output every single time
+### Pure JS 
+`bash runNode_promise.sh <file count>`
 
-### Reader
-There are two applications that you can use to see the different in output between NodeJS and NodeJS + Emscripten
-1. Pure NodeJS implementation
-`node js/node/reader/reader.mjs --files <file1>,<file2>,<file3>,...,<fileN>`
-3. NodeJS + Emscripten (pthreads)
-Once you have built the Emscripten JS layer,
-`node js/emscripten/reader/reader.mjs --files <file1>,<file2>,<file3>,...,<fileN>`
-
-**Note:** if you are on windows on bash, you will need to add `MSYS_NO_PATHCONV=1` before running 
-
-## Helper scripts
-There are helper scripts to start the reader and writer.
-`runWriters.sh N`
-where N is a number starts 1-N processes outputing data in output/testN.dat . the `--seed` parameter is the value N
-
-`runEmscriptenReader.sh N`
-similarly, to run the emscripten based reader and use 1-N file streams, call the above
-
-For Node-based implementations, run `runNodeReader_worker.sh` for the worker based version or `runNodeReader_promise.sh` for the promise based on.
+### Thread-based
+`bash runNode_thread.sh <file count>`
 
 ## Addendum
 - This code is provided as is. Please see the license for more details
